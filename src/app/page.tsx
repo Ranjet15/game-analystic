@@ -9,13 +9,11 @@ import Analytics from '@/components/Analytics';
 export default function Home() {
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedTeamName, setSelectedTeamName] = useState('');
-  const [selectedTeamLogo, setSelectedTeamLogo] = useState<string>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const handleTeamSelect = (teamId: string, teamName: string, teamLogo?: string) => {
     setSelectedTeamId(teamId);
     setSelectedTeamName(teamName);
-    setSelectedTeamLogo(teamLogo);
   };
 
   const handleMatchAdded = () => {
@@ -41,25 +39,9 @@ export default function Home() {
           <>
             {/* Team Info */}
             <div className="bg-gray-900 rounded-lg shadow-md p-6 mb-6 border-l-4 border-yellow-400 flex items-center gap-4">
-              {selectedTeamLogo ? (
-                <img 
-                  src={selectedTeamLogo} 
-                  alt={selectedTeamName}
-                  className="w-20 h-20 object-contain rounded border border-yellow-400"
-                  onError={(e) => {
-                    // Show fallback if image fails to load
-                    e.currentTarget.style.display = 'none';
-                    const fallback = document.createElement('div');
-                    fallback.className = 'w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-2xl font-bold text-yellow-400 border border-yellow-400';
-                    fallback.textContent = selectedTeamName.charAt(0);
-                    e.currentTarget.parentElement?.insertBefore(fallback, e.currentTarget);
-                  }}
-                />
-              ) : (
-                <div className="w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-4xl font-bold text-yellow-400">
-                  {selectedTeamName.charAt(0)}
-                </div>
-              )}
+              <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded flex items-center justify-center text-2xl font-bold text-black border-2 border-yellow-400">
+                {selectedTeamName.split(' ').map(word => word.charAt(0)).join('').toUpperCase().substring(0, 3)}
+              </div>
               <div>
                 <h2 className="text-3xl font-bold text-yellow-400">
                   {selectedTeamName}

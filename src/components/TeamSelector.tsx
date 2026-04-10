@@ -13,8 +13,6 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
   const [loading, setLoading] = useState(true);
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamCode, setNewTeamCode] = useState('');
-  const [logoPreview, setLogoPreview] = useState<string>('');
-  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [showPHMLTeams, setShowPHMLTeams] = useState(false);
   const phMLTeams = getAllPHMLTeams();
 
@@ -29,28 +27,14 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
     setLoading(false);
   }
 
-  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
   function handleAddTeam(e: React.FormEvent) {
     e.preventDefault();
     if (!newTeamName || !newTeamCode) return;
 
     try {
-      addTeam(newTeamName, newTeamCode, logoPreview);
+      addTeam(newTeamName, newTeamCode);
       setNewTeamName('');
       setNewTeamCode('');
-      setLogoPreview('');
-      setLogoFile(null);
       loadStoredTeams();
     } catch (error) {
       console.error('Failed to add team:', error);
@@ -66,7 +50,7 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
         return;
       }
       
-      addTeam(phmlTeam.name, phmlTeam.code, phmlTeam.logo);
+      addTeam(phmlTeam.name, phmlTeam.code);
       loadStoredTeams();
       setShowPHMLTeams(false);
     } catch (error) {
@@ -89,21 +73,9 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
                 onClick={() => onTeamSelect(team.id, team.name, team.logo)}
                 className="p-4 border-2 border-yellow-400 rounded-lg hover:bg-yellow-400/20 transition text-center bg-gray-900 flex flex-col items-center justify-center gap-2"
               >
-                {team.logo ? (
-                  <img 
-                    src={team.logo} 
-                    alt={team.name}
-                    className="w-16 h-16 object-contain rounded"
-                    onError={(e) => {
-                      // Fallback if image fails to load
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center text-2xl font-bold text-yellow-400">
-                    {team.code}
-                  </div>
-                )}
+                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded flex items-center justify-center text-sm font-bold text-black border border-yellow-400">
+                  {team.code}
+                </div>
                 <div>
                   <h3 className="font-bold text-yellow-400 text-sm">{team.name}</h3>
                   <p className="text-yellow-300 text-xs">{team.code}</p>
@@ -132,14 +104,9 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
                       onClick={() => handleAddPHMLTeam(team)}
                       className="p-2 border border-blue-400 rounded hover:bg-blue-400/20 transition text-center bg-gray-800 flex flex-col items-center justify-center gap-2 text-sm"
                     >
-                      <img 
-                        src={team.logo}
-                        alt={team.name}
-                        className="w-12 h-12 object-contain rounded"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded flex items-center justify-center text-xs font-bold text-white">
+                        {team.code}
+                      </div>
                       <div>
                         <p className="font-bold text-blue-400 text-xs">{team.code}</p>
                         <p className="text-blue-300 text-xs">{team.name.split(' ').slice(0, 2).join(' ')}</p>
@@ -169,31 +136,12 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
                     className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white flex-1"
                   />
                 </div>
-                
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <label className="block text-yellow-400 font-semibold mb-2 text-sm">Team Logo (Optional)</label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoChange}
-                      className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white w-full text-sm"
-                    />
-                  </div>
-                  {logoPreview && (
-                    <img 
-                      src={logoPreview}
-                      alt="Logo Preview"
-                      className="w-12 h-12 object-contain rounded border border-yellow-400"
-                    />
-                  )}
-                </div>
 
                 <button
                   type="submit"
                   className="w-full px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition"
                 >
-                  Add Custom Team
+                  Add Team
                 </button>
               </div>
             </form>
