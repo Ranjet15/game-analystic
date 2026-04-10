@@ -9,11 +9,13 @@ import Analytics from '@/components/Analytics';
 export default function Home() {
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedTeamName, setSelectedTeamName] = useState('');
+  const [selectedTeamLogo, setSelectedTeamLogo] = useState<string>();
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleTeamSelect = (teamId: string, teamName: string) => {
+  const handleTeamSelect = (teamId: string, teamName: string, teamLogo?: string) => {
     setSelectedTeamId(teamId);
     setSelectedTeamName(teamName);
+    setSelectedTeamLogo(teamLogo);
   };
 
   const handleMatchAdded = () => {
@@ -38,10 +40,24 @@ export default function Home() {
         {selectedTeamId ? (
           <>
             {/* Team Info */}
-            <div className="bg-gray-900 rounded-lg shadow-md p-6 mb-6 border-l-4 border-yellow-400">
-              <h2 className="text-2xl font-bold text-yellow-400">
-                📍 {selectedTeamName}
-              </h2>
+            <div className="bg-gray-900 rounded-lg shadow-md p-6 mb-6 border-l-4 border-yellow-400 flex items-center gap-4">
+              {selectedTeamLogo ? (
+                <img 
+                  src={selectedTeamLogo} 
+                  alt={selectedTeamName}
+                  className="w-20 h-20 object-contain rounded border border-yellow-400"
+                />
+              ) : (
+                <div className="w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-4xl font-bold text-yellow-400">
+                  {selectedTeamName.charAt(0)}
+                </div>
+              )}
+              <div>
+                <h2 className="text-3xl font-bold text-yellow-400">
+                  {selectedTeamName}
+                </h2>
+                <p className="text-yellow-300 text-sm mt-1">Team Analytics Dashboard</p>
+              </div>
             </div>
 
             {/* Tabs/Sections */}

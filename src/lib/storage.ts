@@ -2,6 +2,7 @@ export interface Team {
   id: string;
   name: string;
   code: string;
+  logo?: string; // Base64 encoded logo
   createdAt: string;
 }
 
@@ -200,17 +201,29 @@ export function loadTeams(): Team[] {
   return readStorage<Team[]>(TEAM_KEY) ?? [];
 }
 
-export function addTeam(name: string, code: string): Team {
+export function addTeam(name: string, code: string, logo?: string): Team {
   const teams = loadTeams();
   const team: Team = {
     id: crypto.randomUUID(),
     name,
     code,
+    logo,
     createdAt: new Date().toISOString(),
   };
   teams.push(team);
   writeStorage(TEAM_KEY, teams);
   return team;
+}
+
+export function updateTeamLogo(teamId: string, logo: string): Team | null {
+  const teams = loadTeams();
+  const team = teams.find(t => t.id === teamId);
+  if (team) {
+    team.logo = logo;
+    writeStorage(TEAM_KEY, teams);
+    return team;
+  }
+  return null;
 }
 
 export function loadMatches(teamId: string): MatchRecord[] {

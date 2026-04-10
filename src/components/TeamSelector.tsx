@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { addTeam, loadTeams, Team } from '@/lib/storage';
+import { addTeam, loadTeams, Team, updateTeamLogo } from '@/lib/storage';
 
 interface TeamSelectorProps {
-  onTeamSelect: (teamId: string, teamName: string) => void;
+  onTeamSelect: (teamId: string, teamName: string, teamLogo?: string) => void;
 }
 
 export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
@@ -12,6 +12,8 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
   const [loading, setLoading] = useState(true);
   const [newTeamName, setNewTeamName] = useState('');
   const [newTeamCode, setNewTeamCode] = useState('');
+  const [logoPreview, setLogoPreview] = useState<string>('');
+  const [logoFile, setLogoFile] = useState<File | null>(null);
 
   useEffect(() => {
     loadStoredTeams();
@@ -24,14 +26,28 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
     setLoading(false);
   }
 
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   function handleAddTeam(e: React.FormEvent) {
     e.preventDefault();
     if (!newTeamName || !newTeamCode) return;
 
     try {
-      addTeam(newTeamName, newTeamCode);
+      addTeam(newTeamName, newTeamCode, logoPreview);
       setNewTeamName('');
       setNewTeamCode('');
+      setLogoPreview('');
+      setLogoFile(null);
       loadStoredTeams();
     } catch (error) {
       console.error('Failed to add team:', error);
@@ -46,42 +62,79 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
         <p>Loading teams...</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {teams.map((team) => (
               <button
                 key={team.id}
-                onClick={() => onTeamSelect(team.id, team.name)}
-                className="p-4 border-2 border-yellow-400 rounded-lg hover:bg-yellow-400/20 transition text-left bg-gray-900"
+                onClick={() => onTeamSelect(team.id, team.name, team.logo)}
+                className="p-4 border-2 border-yellow-400 rounded-lg hover:bg-yellow-400/20 transition text-center bg-gray-900 flex flex-col items-center justify-center gap-2"
               >
-                <h3 className="font-bold text-lg text-yellow-400">{team.name}</h3>
-                <p className="text-yellow-300">{team.code}</p>
+                {team.logo ? (
+                  <img 
+                    src={team.logo} 
+                    alt={team.name}
+                    className="w-16 h-16 object-contain rounded"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-gray-700 rounded flex items-center justify-center text-2xl font-bold text-yellow-400">
+                    {team.code}
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-bold text-yellow-400 text-sm">{team.name}</h3>
+                  <p className="text-yellow-300 text-xs">{team.code}</p>
+                </div>
               </button>
             ))}
           </div>
 
           <div className="border-t border-gray-600 pt-6">
             <h3 className="font-bold mb-3 text-yellow-400">Add New Team</h3>
-            <form onSubmit={handleAddTeam} className="flex gap-2 flex-wrap">
-              <input
-                type="text"
-                placeholder="Team Name"
-                value={newTeamName}
-                onChange={(e) => setNewTeamName(e.target.value)}
-                className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white"
-              />
-              <input
-                type="text"
-                placeholder="Team Code"
-                value={newTeamCode}
-                onChange={(e) => setNewTeamCode(e.target.value)}
-                className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition"
-              >
-                Add Team
-              </button>
+            <form onSubmit={handleAddTeam}>
+              <div className="space-y-3">
+                <div className="flex gap-2 flex-wrap">
+                  <input
+                    type="text"
+                    placeholder="Team Name"
+                    value={newTeamName}
+                    onChange={(e) => setNewTeamName(e.target.value)}
+                    className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white flex-1"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Team Code"
+                    value={newTeamCode}
+                    onChange={(e) => setNewTeamCode(e.target.value)}
+                    className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white flex-1"
+                  />
+                </div>
+                
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="block text-yellow-400 font-semibold mb-2 text-sm">Team Logo (Optional)</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      className="px-3 py-2 border border-yellow-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 bg-gray-700 text-white w-full text-sm"
+                    />
+                  </div>
+                  {logoPreview && (
+                    <img 
+                      src={logoPreview}
+                      alt="Logo Preview"
+                      className="w-12 h-12 object-contain rounded border border-yellow-400"
+                    />
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-300 transition"
+                >
+                  Add Team
+                </button>
+              </div>
             </form>
           </div>
         </>
