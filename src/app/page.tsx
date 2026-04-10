@@ -46,6 +46,14 @@ export default function Home() {
                   src={selectedTeamLogo} 
                   alt={selectedTeamName}
                   className="w-20 h-20 object-contain rounded border border-yellow-400"
+                  onError={(e) => {
+                    // Show fallback if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    const fallback = document.createElement('div');
+                    fallback.className = 'w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-2xl font-bold text-yellow-400 border border-yellow-400';
+                    fallback.textContent = selectedTeamName.charAt(0);
+                    e.currentTarget.parentElement?.insertBefore(fallback, e.currentTarget);
+                  }}
                 />
               ) : (
                 <div className="w-20 h-20 bg-gray-700 rounded flex items-center justify-center text-4xl font-bold text-yellow-400">
