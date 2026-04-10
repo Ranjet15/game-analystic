@@ -5,6 +5,7 @@ import TeamSelector from '@/components/TeamSelector';
 import MatchForm from '@/components/MatchForm';
 import HeroStatsTable from '@/components/HeroStatsTable';
 import Analytics from '@/components/Analytics';
+import { resetAllDataExceptTeams } from '@/lib/storage';
 
 export default function Home() {
   const [selectedTeamId, setSelectedTeamId] = useState('');
@@ -21,6 +22,13 @@ export default function Home() {
   const handleMatchAdded = () => {
     // Trigger refresh of stats and analytics
     setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleResetData = () => {
+    if (confirm('Are you sure you want to clear all matches and hero statistics? Your teams will be kept.')) {
+      resetAllDataExceptTeams();
+      window.location.reload();
+    }
   };
 
   return (
@@ -50,6 +58,12 @@ export default function Home() {
                 </h2>
                 <p className="text-yellow-300 text-sm mt-1">Team Analytics Dashboard</p>
               </div>
+              <button
+                onClick={handleResetData}
+                className="ml-auto px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition text-sm"
+              >
+                🔄 Reset Data
+              </button>
             </div>
 
             {/* Tabs/Sections */}

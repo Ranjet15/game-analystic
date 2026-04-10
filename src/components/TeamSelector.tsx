@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { addTeam, loadTeams, Team } from '@/lib/storage';
+import { addTeam, loadTeams, removeTeam, Team } from '@/lib/storage';
 
 interface TeamSelectorProps {
   onTeamSelect: (teamId: string, teamName: string, teamCode: string) => void;
@@ -38,6 +38,17 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
     }
   }
 
+  function handleRemoveTeam(teamId: string, teamName: string) {
+    if (confirm(`Are you sure you want to remove "${teamName}" and all its data?`)) {
+      try {
+        removeTeam(teamId);
+        loadStoredTeams();
+      } catch (error) {
+        console.error('Failed to remove team:', error);
+      }
+    }
+  }
+
   return (
     <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6">
       <h2 className="text-2xl font-bold mb-4 text-yellow-400">Teams</h2>
@@ -48,19 +59,30 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
         <>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
             {teams.map((team) => (
-              <button
+              <div
                 key={team.id}
-                onClick={() => onTeamSelect(team.id, team.name, team.code)}
-                className="p-4 border-2 border-yellow-400 rounded-lg hover:bg-yellow-400/20 transition text-center bg-gray-900 flex flex-col items-center justify-center gap-2"
+                className="p-4 border-2 border-yellow-400 rounded-lg bg-gray-900 flex flex-col items-center justify-center gap-2 relative group"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded flex items-center justify-center text-sm font-bold text-black border border-yellow-400">
-                  {team.code}
-                </div>
-                <div>
-                  <h3 className="font-bold text-yellow-400 text-sm">{team.name}</h3>
-                  <p className="text-yellow-300 text-xs">{team.code}</p>
-                </div>
-              </button>
+                <button
+                  onClick={() => onTeamSelect(team.id, team.name, team.code)}
+                  className="w-full hover:bg-yellow-400/20 transition rounded flex flex-col items-center gap-2"
+                >
+                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded flex items-center justify-center text-sm font-bold text-black border border-yellow-400">
+                    {team.code}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-yellow-400 text-sm">{team.name}</h3>
+                    <p className="text-yellow-300 text-xs">{team.code}</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleRemoveTeam(team.id, team.name)}
+                  className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold opacity-0 group-hover:opacity-100 transition"
+                  title="Remove team"
+                >
+                  ✕
+                </button>
+              </div>
             ))}
           </div>
 

@@ -215,6 +215,21 @@ export function addTeam(name: string, code: string, logo?: string): Team {
   return team;
 }
 
+export function removeTeam(teamId: string): void {
+  const teams = loadTeams();
+  const filtered = teams.filter(t => t.id !== teamId);
+  writeStorage(TEAM_KEY, filtered);
+  
+  // Also remove all matches and stats for this team
+  const matches = readStorage<MatchRecord[]>(MATCH_KEY) ?? [];
+  const filteredMatches = matches.filter(m => m.teamId !== teamId);
+  writeStorage(MATCH_KEY, filteredMatches);
+  
+  const stats = getStats();
+  const filteredStats = stats.filter(s => s.teamId !== teamId);
+  saveStats(filteredStats);
+}
+
 export function updateTeamLogo(teamId: string, logo: string): Team | null {
   const teams = loadTeams();
   const team = teams.find(t => t.id === teamId);
@@ -382,4 +397,11 @@ export function updateHeroStat(id: string, wins: number, losses: number): HeroSt
   stat.updatedAt = new Date().toISOString();
   saveStats(stats);
   return stat;
+}
+
+export function resetAllDataExceptTeams(): void {
+  if (typeof window === 'undefined') return;
+  // Clear matches and hero statistics
+  window.localStorage.removeItem(MATCH_KEY);
+  window.localStorage.removeItem(HERO_STATS_KEY);
 }
