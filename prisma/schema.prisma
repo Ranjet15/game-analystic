@@ -1,0 +1,39 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Team {
+  id     Int     @id @default(autoincrement())
+  name   String
+  heroes HeroStat[]
+}
+
+model Hero {
+  id     Int     @id @default(autoincrement())
+  name   String
+  stats  HeroStat[]
+}
+
+model HeroStat {
+  id      Int  @id @default(autoincrement())
+  teamId  Int
+  heroId  Int
+  wins    Int  @default(0)
+  losses  Int  @default(0)
+
+  team Team @relation(fields: [teamId], references: [id])
+  hero Hero @relation(fields: [heroId], references: [id])
+}
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  teamId    Int
+  heroId    Int
+  result    String
+  createdAt DateTime @default(now())
+}
