@@ -1,6 +1,6 @@
 # 📊 Mobile Legends Analytics Dashboard
 
-A comprehensive game analytics platform for Mobile Legends teams to track hero performance, match results, and ban statistics. Built with Next.js, PostgreSQL, and Prisma ORM.
+A comprehensive game analytics platform for Mobile Legends teams to track hero performance, match results, and ban statistics. Built with Next.js, Tailwind CSS, Recharts, and browser localStorage.
 
 ## 🎯 Features
 
@@ -14,12 +14,10 @@ A comprehensive game analytics platform for Mobile Legends teams to track hero p
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 15+ (React, TypeScript, Tailwind CSS)
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL
-- **ORM**: Prisma
+- **Frontend**: Next.js 16.2.3 (React, TypeScript)
+- **Styling**: Tailwind CSS
+- **Data persistence**: Browser localStorage
 - **Charts**: Recharts
-- **Validation**: Zod
 - **Package Manager**: npm
 
 ## 📋 Prerequisites
@@ -27,8 +25,6 @@ A comprehensive game analytics platform for Mobile Legends teams to track hero p
 Before you begin, ensure you have:
 
 - Node.js 18+ and npm installed
-- PostgreSQL database running
-- PostgreSQL connection string ready
 
 ## ⚙️ Installation & Setup
 
@@ -38,37 +34,15 @@ Before you begin, ensure you have:
 npm install
 ```
 
-### 2. Configure Database
-
-Create a `.env.local` file in the project root:
-
-```env
-DATABASE_URL="postgresql://user:password@localhost:5432/mpl_analytics"
-NEXT_PUBLIC_API_URL="http://localhost:3000"
-```
-
-Replace the connection string with your PostgreSQL credentials.
-
-### 3. Initialize Database
-
-Create the database schema and migrations:
+### 2. Start Development Server
 
 ```bash
-npx prisma migrate dev --name init
+npm run dev
 ```
 
-This will:
-- Create all necessary tables
-- Set up relationships and constraints
-- Generate Prisma Client
+Open your browser to `http://localhost:3000`.
 
-### 4. Seed Sample Data (Optional)
-
-To populate the database with sample heroes:
-
-```bash
-npx prisma db seed
-```
+No database configuration is required.
 
 ## 🚀 Running the Application
 
@@ -138,11 +112,6 @@ npm start
 ```
 src/
 ├── app/
-│   ├── api/
-│   │   ├── teams/route.ts          # Teams CRUD API
-│   │   ├── heroes/route.ts         # Heroes CRUD API
-│   │   ├── matches/route.ts        # Matches creation API
-│   │   └── hero-stats/route.ts     # Stats management API
 │   ├── layout.tsx                  # Root layout
 │   ├── page.tsx                    # Main dashboard
 │   └── globals.css                 # Global styles
@@ -151,23 +120,11 @@ src/
 │   ├── MatchForm.tsx               # Match input form
 │   ├── HeroStatsTable.tsx          # Hero statistics table
 │   └── Analytics.tsx               # Analytics dashboard
-└── prisma/
-    └── schema.prisma               # Database schema
-
+└── lib/
+    └── storage.ts                 # Browser localStorage persistence
 ```
 
-## 🔌 API Routes
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/teams` | GET | Fetch all teams |
-| `/api/teams` | POST | Create new team |
-| `/api/heroes` | GET | Fetch all heroes |
-| `/api/heroes` | POST | Add new hero |
-| `/api/matches` | POST | Record new match |
-| `/api/matches` | GET | Fetch team matches |
-| `/api/hero-stats` | GET | Fetch hero statistics |
-| `/api/hero-stats` | PUT | Update hero stats |
+This app stores all data locally in the browser using localStorage. There is no external database or server-side ORM required.
 
 ## 🎨 UI Components
 
@@ -234,16 +191,14 @@ Dashboard with visualizations:
 
 ## 🐛 Troubleshooting
 
-### Database Connection Error
-- Verify PostgreSQL is running
-- Check DATABASE_URL in `.env.local`
-- Ensure database exists and credentials are correct
+### Common Issues
+- If the dashboard does not load, ensure your browser supports localStorage.
+- If data does not persist, verify that storage is not blocked by privacy settings or incognito mode.
+- If a form does not submit, make sure all fields are completed and 5 heroes are selected.
 
-### Migration Issues
-```bash
-npx prisma migrate reset
-```
-(⚠️ Warning: Deletes all data)
+### Build Issues
+- Run `npm install` again if dependencies are missing.
+- Run `npm run build` to check production compilation.
 
 ### Port Already in Use
 ```bash

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getHeroStatsByMatchType, updateHeroStat } from '@/lib/storage';
 
 interface HeroStat {
   id: string;
@@ -29,40 +30,25 @@ export default function HeroStatsTable({ teamId, refreshTrigger }: HeroStatsTabl
 
   useEffect(() => {
     fetchStats();
-  }, [teamId, refreshTrigger]);
+  }, [teamId, refreshTrigger, filterType]);
 
-  async function fetchStats() {
-    try {
-      const res = await fetch(`/api/hero-stats?teamId=${teamId}`);
-      const data = await res.json();
-      setStats(data);
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    } finally {
-      setLoading(false);
+  function fetchStats() {
+    setLoading(true);
+    const data = getHeroStatsByMatchType(teamId, filterType as 'Overall' | 'Scrim' | 'Official');
+    setStats(data);
+    setLoading(false);
+  }
+
+  function handleEditStat(statId: string, wins: number, losses: number) {
+    const updated = updateHeroStat(statId, wins, losses);
+    if (updated) {
+      setEditingId(null);
+      fetchStats();
+      alert('Stats updated!');
     }
   }
 
-  async function handleEditStat(statId: string, wins: number, losses: number) {
-    try {
-      const res = await fetch('/api/hero-stats', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: statId, wins, losses })
-      });
-
-      if (res.ok) {
-        setEditingId(null);
-        fetchStats();
-        alert('Stats updated!');
-      }
-    } catch (error) {
-      console.error('Failed to update stats:', error);
-      alert('Error updating stats');
-    }
-  }
-
-  const filteredStats = stats.filter(s => s.matchType === filterType);
+  const filteredStats = stats;
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6">
@@ -171,15 +157,19 @@ export default function HeroStatsTable({ teamId, refreshTrigger }: HeroStatsTabl
                             {stat.winrate.toFixed(1)}%
                           </td>
                           <td className="px-4 py-3 text-center">
-                            <button
-                              onClick={() => {
-                                setEditingId(stat.id);
-                                setEditValues({wins: stat.wins, losses: stat.losses});
-                              }}
-                              className="px-3 py-1 bg-yellow-400 text-black font-bold rounded hover:bg-yellow-300 text-sm"
-                            >
-                              Edit
-                            </button>
+                            {filterType === 'Overall' ? (
+                              <span className="text-yellow-300 text-sm">Read-only</span>
+                            ) : (
+                              <button
+                                onClick={() => {
+                                  setEditingId(stat.id);
+                                  setEditValues({wins: stat.wins, losses: stat.losses});
+                                }}
+                                className="px-3 py-1 bg-yellow-400 text-black font-bold rounded hover:bg-yellow-300 text-sm"
+                              >
+                                Edit
+                              </button>
+                            )}
                           </td>
                         </>
                       )}

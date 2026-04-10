@@ -1,12 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface Team {
-  id: string;
-  name: string;
-  code: string;
-}
+import { addTeam, loadTeams, Team } from '@/lib/storage';
 
 interface TeamSelectorProps {
   onTeamSelect: (teamId: string, teamName: string) => void;
@@ -19,37 +14,25 @@ export default function TeamSelector({ onTeamSelect }: TeamSelectorProps) {
   const [newTeamCode, setNewTeamCode] = useState('');
 
   useEffect(() => {
-    fetchTeams();
+    loadStoredTeams();
   }, []);
 
-  async function fetchTeams() {
-    try {
-      const res = await fetch('/api/teams');
-      const data = await res.json();
-      setTeams(data);
-    } catch (error) {
-      console.error('Failed to fetch teams:', error);
-    } finally {
-      setLoading(false);
-    }
+  function loadStoredTeams() {
+    setLoading(true);
+    const data = loadTeams();
+    setTeams(data);
+    setLoading(false);
   }
 
-  async function handleAddTeam(e: React.FormEvent) {
+  function handleAddTeam(e: React.FormEvent) {
     e.preventDefault();
     if (!newTeamName || !newTeamCode) return;
 
     try {
-      const res = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newTeamName, code: newTeamCode })
-      });
-
-      if (res.ok) {
-        setNewTeamName('');
-        setNewTeamCode('');
-        fetchTeams();
-      }
+      addTeam(newTeamName, newTeamCode);
+      setNewTeamName('');
+      setNewTeamCode('');
+      loadStoredTeams();
     } catch (error) {
       console.error('Failed to add team:', error);
     }

@@ -5,7 +5,7 @@ This is a Next.js application for tracking Mobile Legends team performance, hero
 ## Project Overview
 
 - **Purpose**: Game analytics platform for Mobile Legends teams
-- **Tech Stack**: Next.js 15, React, TypeScript, PostgreSQL, Prisma, Recharts, Tailwind CSS
+- **Tech Stack**: Next.js 16, React, TypeScript, Recharts, Tailwind CSS, localStorage
 - **Key Features**: Team management, match tracking, hero analytics, interactive dashboards
 
 ## Architecture
@@ -13,29 +13,17 @@ This is a Next.js application for tracking Mobile Legends team performance, hero
 ### Frontend
 - Next.js App Router with TypeScript
 - React components in `src/components/`
-- Server and client components
+- Client-side persistence using browser localStorage
 - Tailwind CSS for styling
 - Recharts for data visualization
 
 ### Backend
-- API routes in `src/app/api/`
-- Prisma ORM for database operations
-- RESTful endpoints for CRUD operations
-
-### Database
-- PostgreSQL with Prisma schema
-- 9 interconnected tables for data management
-- Automatic winrate calculations
+- No server-side database required
+- All data is stored in the browser using localStorage
 
 ## Getting Started
 
-### 1. Database Setup
-```bash
-# Configure DATABASE_URL in .env.local
-npx prisma migrate dev --name init
-```
-
-### 2. Run Development Server
+### 1. Run Development Server
 ```bash
 npm run dev
 ```
@@ -49,30 +37,22 @@ Open http://localhost:3000
 |------|---------|
 | `src/components/` | React components (TeamSelector, MatchForm, HeroStatsTable, Analytics) |
 | `src/app/page.tsx` | Main dashboard page |
-| `src/app/api/` | Backend API routes |
-| `prisma/schema.prisma` | Database schema definition |
-| `.env.local` | Environment variables (DATABASE_URL, NEXT_PUBLIC_API_URL) |
+| `src/lib/storage.ts` | Browser localStorage persistence |
 | `README.md` | Comprehensive user guide |
 
 ## Common Development Tasks
 
 ### Adding a New Feature
-1. Update Prisma schema if needed
-2. Run migrations: `npx prisma migrate dev --name feature_name`
-3. Create API routes in `src/app/api/`
-4. Build React components in `src/components/`
-5. Integrate into dashboard pages
+1. Update or add React components in `src/components/`
+2. Use 'use client' for interactive UI
+3. Leverage localStorage helpers in `src/lib/storage.ts`
+4. Style with Tailwind CSS
+5. Integrate into the dashboard page
 
-### Modifying the Database
-1. Update `prisma/schema.prisma`
-2. Create migration: `npx prisma migrate dev --name change_description`
-3. Update API routes and components accordingly
-
-### Adding New API Endpoints
-1. Create new route file: `src/app/api/[resource]/route.ts`
-2. Implement GET, POST, PUT, DELETE as needed
-3. Use Prisma client for database operations
-4. Return JSON responses
+### Modifying Persistence
+1. Update helper functions in `src/lib/storage.ts`
+2. Keep data stored in browser localStorage
+3. Avoid introducing server-side database dependencies
 
 ### Creating New Components
 1. Create in `src/components/ComponentName.tsx`
@@ -82,21 +62,16 @@ Open http://localhost:3000
 
 ## Important Notes
 
-- All API endpoints use Prisma for database interactions
-- Components use React hooks (useState, useEffect) for state management
+- The app uses browser localStorage for all data storage
+- Components use React hooks (useState, useEffect)
 - Styling is Tailwind CSS-based
 - Charts use Recharts library
-- Database cascades on delete for referential integrity
-
-## Database Models
-- Team, Hero, Player, Match, MatchHero, Ban, HeroStats
+- No Prisma or PostgreSQL setup is required
 
 ## Next Steps
-- Set up PostgreSQL database
-- Configure .env.local
-- Run migrations
-- Seed initial hero data
-- Start development
+- Run `npm install`
+- Run `npm run dev`
+- Use the dashboard in the browser
 
 ---
 

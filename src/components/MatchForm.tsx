@@ -1,12 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-interface Hero {
-  id: string;
-  name: string;
-  role: string;
-}
+import { addMatch, getHeroes, Hero } from '@/lib/storage';
 
 interface MatchFormProps {
   teamId: string;
@@ -21,58 +16,24 @@ export default function MatchForm({ teamId, onMatchAdded }: MatchFormProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchHeroes();
+    const data = getHeroes();
+    setHeroes(data);
+    setLoading(false);
   }, []);
 
-  async function fetchHeroes() {
-    try {
-      const res = await fetch('/api/heroes');
-      const data = await res.json();
-      setHeroes(data);
-    } catch (error) {
-      console.error('Failed to fetch heroes:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleAddMatch(e: React.FormEvent) {
+  function handleAddMatch(e: React.FormEvent) {
     e.preventDefault();
-    if (!teamId || selectedHeroes.some(h => !h)) {
+    if (!teamId || selectedHeroes.some((h) => !h)) {
       alert('Please select all 5 heroes');
       return;
     }
 
-    const heroes = selectedHeroes.map(heroId => ({
-      heroId,
-      position: 'Unknown'
-    }));
-
-    try {
-      const res = await fetch('/api/matches', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          teamId,
-          matchType,
-          result,
-          heroes
-        })
-      });
-
-      if (res.ok) {
-        setSelectedHeroes(['', '', '', '', '']);
-        setResult('Win');
-        setMatchType('Scrim');
-        onMatchAdded();
-        alert('Match added successfully!');
-      } else {
-        alert('Failed to add match');
-      }
-    } catch (error) {
-      console.error('Failed to add match:', error);
-      alert('Error adding match');
-    }
+    addMatch(teamId, matchType, result, selectedHeroes);
+    setSelectedHeroes(['', '', '', '', '']);
+    setResult('Win');
+    setMatchType('Scrim');
+    onMatchAdded();
+    alert('Match added successfully!');
   }
 
   const handleHeroChange = (index: number, heroId: string) => {

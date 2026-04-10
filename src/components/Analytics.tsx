@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { getHeroStatsByMatchType } from '@/lib/storage';
 
 interface HeroStat {
   id: string;
@@ -29,16 +30,11 @@ export default function Analytics({ teamId, refreshTrigger }: AnalyticsProps) {
     fetchStats();
   }, [teamId, refreshTrigger]);
 
-  async function fetchStats() {
-    try {
-      const res = await fetch(`/api/hero-stats?teamId=${teamId}`);
-      const data = await res.json();
-      setStats(data);
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    } finally {
-      setLoading(false);
-    }
+  function fetchStats() {
+    setLoading(true);
+    const data = getHeroStatsByMatchType(teamId, 'Overall');
+    setStats(data);
+    setLoading(false);
   }
 
   if (loading) return <p className="text-yellow-400">Loading analytics...</p>;
