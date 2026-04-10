@@ -9,11 +9,13 @@ import Analytics from '@/components/Analytics';
 export default function Home() {
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [selectedTeamName, setSelectedTeamName] = useState('');
+  const [selectedTeamCode, setSelectedTeamCode] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const handleTeamSelect = (teamId: string, teamName: string, teamLogo?: string) => {
+  const handleTeamSelect = (teamId: string, teamName: string, teamCode: string) => {
     setSelectedTeamId(teamId);
     setSelectedTeamName(teamName);
+    setSelectedTeamCode(teamCode);
   };
 
   const handleMatchAdded = () => {
@@ -40,7 +42,7 @@ export default function Home() {
             {/* Team Info */}
             <div className="bg-gray-900 rounded-lg shadow-md p-6 mb-6 border-l-4 border-yellow-400 flex items-center gap-4">
               <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded flex items-center justify-center text-2xl font-bold text-black border-2 border-yellow-400">
-                {selectedTeamName.split(' ').map(word => word.charAt(0)).join('').toUpperCase().substring(0, 3)}
+                {selectedTeamCode}
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-yellow-400">
