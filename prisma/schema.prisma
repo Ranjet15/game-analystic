@@ -1,39 +1,64 @@
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
+  output   = "/app/generated/prisma-client"
 }
 
 model Team {
-  id     Int     @id @default(autoincrement())
-  name   String
-  heroes HeroStat[]
+  id        String   @id @default(cuid())
+  name      String
+  code      String
+  createdAt DateTime @default(now())
+  matches   Match[]
+  heroStats HeroStat[]
+
+  @@map("teams")
 }
 
 model Hero {
-  id     Int     @id @default(autoincrement())
+  id     String     @id @default(cuid())
   name   String
+  role   String
   stats  HeroStat[]
+
+  @@map("heroes")
 }
 
 model HeroStat {
-  id      Int  @id @default(autoincrement())
-  teamId  Int
-  heroId  Int
-  wins    Int  @default(0)
-  losses  Int  @default(0)
+  id           String @id @default(cuid())
+  teamId       String
+  heroId       String
+  totalMatches Int    @default(0)
+  wins         Int    @default(0)
+  losses       Int    @default(0)
+  winrate      Float  @default(0)
+  banCount     Int    @default(0)
+  banRate      Float  @default(0)
+  matchType    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  team Team @relation(fields: [teamId], references: [id])
-  hero Hero @relation(fields: [heroId], references: [id])
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  hero Hero @relation(fields: [heroId], references: [id], onDelete: Cascade)
+
+  @@map("hero_stats")
 }
 
 model Match {
-  id        Int      @id @default(autoincrement())
-  teamId    Int
-  heroId    Int
-  result    String
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  teamId          String
+  matchType       String
+  result          String
+  heroIds         String[] // Array of hero IDs (ally team)
+  bannedHeroes    String[] // Array of banned hero IDs (ally team)
+  enemyHeroIds    String[] // Array of enemy hero IDs
+  enemyBannedHeroes String[] // Array of enemy banned hero IDs
+  date            DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@map("matches")
 }

@@ -9,6 +9,8 @@ interface HeroStat {
   wins: number;
   losses: number;
   winrate: number;
+  banCount: number;
+  banRate: number;
   matchType: string;
   hero: {
     name: string;
@@ -78,13 +80,15 @@ export default function HeroStatsTable({ teamId, refreshTrigger }: HeroStatsTabl
                 <th className="px-4 py-2 text-center text-yellow-400 font-bold">Wins</th>
                 <th className="px-4 py-2 text-center text-yellow-400 font-bold">Losses</th>
                 <th className="px-4 py-2 text-center text-yellow-400 font-bold">Win Rate %</th>
+                <th className="px-4 py-2 text-center text-yellow-400 font-bold">Ban Count</th>
+                <th className="px-4 py-2 text-center text-yellow-400 font-bold">Ban Rate %</th>
                 <th className="px-4 py-2 text-center text-yellow-400 font-bold">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredStats.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-4 text-center text-yellow-300">
+                  <td colSpan={9} className="px-4 py-4 text-center text-yellow-300">
                     No data for {filterType}
                   </td>
                 </tr>
@@ -155,6 +159,10 @@ export default function HeroStatsTable({ teamId, refreshTrigger }: HeroStatsTabl
                           <td className="px-4 py-3 text-center text-white">{stat.losses}</td>
                           <td className="px-4 py-3 text-center font-bold text-yellow-400">
                             {stat.winrate.toFixed(1)}%
+                          </td>
+                          <td className="px-4 py-3 text-center text-white">{stat.banCount}</td>
+                          <td className="px-4 py-3 text-center font-bold text-red-400">
+                            {stat.banRate.toFixed(1)}%
                           </td>
                           <td className="px-4 py-3 text-center">
                             {filterType === 'Overall' ? (

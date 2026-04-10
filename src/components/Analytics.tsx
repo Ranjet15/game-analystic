@@ -10,6 +10,8 @@ interface HeroStat {
   wins: number;
   losses: number;
   winrate: number;
+  banCount: number;
+  banRate: number;
   matchType: string;
   hero: {
     name: string;
@@ -50,6 +52,17 @@ export default function Analytics({ teamId, refreshTrigger }: AnalyticsProps) {
       name: stat.hero.name,
       winrate: stat.winrate,
       matches: stat.totalMatches
+    }));
+
+  // Prepare ban rate data
+  const banData = overallStats
+    .filter(stat => stat.banCount > 0)
+    .sort((a, b) => b.banRate - a.banRate)
+    .slice(0, 10)
+    .map(stat => ({
+      name: stat.hero.name,
+      banRate: stat.banRate,
+      banCount: stat.banCount
     }));
 
   // Get win/loss distribution
@@ -181,6 +194,22 @@ export default function Analytics({ teamId, refreshTrigger }: AnalyticsProps) {
                 <YAxis dataKey="name" type="category" width={100} stroke="#fbbf24" />
                 <Tooltip />
                 <Bar dataKey="matches" fill="#fbbf24" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Ban Rate */}
+        {banData.length > 0 && (
+          <div className="bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-bold mb-4 text-yellow-400">Top 10 Heroes by Ban Rate</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={banData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} stroke="#fbbf24" />
+                <YAxis stroke="#fbbf24" />
+                <Tooltip />
+                <Bar dataKey="banRate" fill="#ef4444" />
               </BarChart>
             </ResponsiveContainer>
           </div>
