@@ -130,7 +130,10 @@ export default function Analytics({ teamId, refreshTrigger }: AnalyticsProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={true}
-                  label={({name, value, percent}) => `${name}: ${value} (${(percent * 100).toFixed(1)}%)`}
+                  label={({name, value, percent}) => {
+                    const pct = percent ?? 0;
+                    return `${name}: ${value} (${(pct * 100).toFixed(1)}%)`;
+                  }}
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
@@ -156,7 +159,7 @@ export default function Analytics({ teamId, refreshTrigger }: AnalyticsProps) {
                   cx="50%"
                   cy="50%"
                   labelLine={true}
-                  label={({name, count}) => `${name}: ${count}`}
+                  label={(entry) => `${entry.name}: ${entry.value}`}
                   outerRadius={100}
                   fill="#fbbf24"
                   dataKey="count"

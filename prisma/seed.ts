@@ -43,7 +43,6 @@ async function main() {
     { name: 'Wanwan', role: 'Marksman' },
     
     // Mages
-    { name: 'Alice', role: 'Mage' },
     { name: 'Aurora', role: 'Mage' },
     { name: 'Cyclops', role: 'Mage' },
     { name: 'Harith', role: 'Mage' },
@@ -51,7 +50,7 @@ async function main() {
   ];
 
   for (const hero of heroes) {
-    await prisma.hero.upsertMany({
+    await prisma.hero.upsert({
       where: { name: hero.name },
       update: { role: hero.role },
       create: hero,
