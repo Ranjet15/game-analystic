@@ -261,7 +261,7 @@ export function addMatch(teamId: string, matchType: string, result: 'Win' | 'Los
   };
   matches.push(match);
   writeStorage(MATCH_KEY, matches);
-  updateStatsForMatch(teamId, matchType, result, heroIds, bannedHeroes);
+  updateStatsForMatch(teamId, matchType, result, heroIds, bannedHeroes, enemyBannedHeroes);
   return match;
 }
 
@@ -317,7 +317,7 @@ export function getHeroStatsByMatchType(teamId: string, matchType: 'Overall' | '
   return Array.from(aggregated.values());
 }
 
-function updateStatsForMatch(teamId: string, matchType: string, result: 'Win' | 'Loss', heroIds: string[], bannedHeroes: string[]) {
+function updateStatsForMatch(teamId: string, matchType: string, result: 'Win' | 'Loss', heroIds: string[], bannedHeroes: string[], enemyBannedHeroes: string[] = []) {
   const stats = getStats();
   const updated: HeroStat[] = [...stats];
   const isWin = result === 'Win';
@@ -354,16 +354,19 @@ function updateStatsForMatch(teamId: string, matchType: string, result: 'Win' | 
     }
   });
 
+  // Merge both team bans - count each hero only once even if both teams banned it
+  const allBannedHeroes = Array.from(new Set([...bannedHeroes, ...enemyBannedHeroes]));
+
   // Update ban counts for all heroes
   const totalMatches = loadMatches(teamId).length + 1; // +1 for current match
   HERO_LIST.forEach((hero) => {
     const stat = updated.find((item) => item.teamId === teamId && item.heroId === hero.id && item.matchType === matchType);
     if (stat) {
-      if (bannedHeroes.includes(hero.id)) {
+      if (allBannedHeroes.includes(hero.id)) {
         stat.banCount += 1;
       }
       stat.banRate = totalMatches > 0 ? parseFloat(((stat.banCount / totalMatches) * 100).toFixed(1)) : 0;
-    } else if (bannedHeroes.includes(hero.id)) {
+    } else if (allBannedHeroes.includes(hero.id)) {
       // Create stat for banned hero if not exists
       updated.push({
         id: crypto.randomUUID(),
